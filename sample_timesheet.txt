@@ -1,0 +1,10 @@
+# tsq log format: DATE START-END PROJECT [DESCRIPTION]
+# lines starting with # are comments; blank lines are ignored
+
+2026-09-14  09:00-11:30  acme       kickoff call and requirements notes
+2026-09-14  13:00-17:00  acme       spec review with client
+2026-09-15  09:00-12:00  internal   standup, planning, inbox
+2026-09-15  13:30-16:00  acme       implementation
+2026-09-16  09:00-10:00  internal   1:1s
+2026-09-16  10:00-15:30  bramble    migration script, first pass
+2026-09-17  09:00-12:30  bramble    migration script, bug fixes
