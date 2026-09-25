@@ -14,7 +14,9 @@ DATE START-END PROJECT [DESCRIPTION]
 ```
 
 - `DATE` is `YYYY-MM-DD`.
-- `START-END` is `HH:MM-HH:MM`, 24-hour clock, same day.
+- `START-END` is `HH:MM-HH:MM`, 24-hour clock. If `END` is earlier than `START`
+  the entry is treated as crossing midnight (it ends the following day); the
+  hours are still counted against `DATE`, the day the entry started.
 - `PROJECT` is a single token (no spaces) -- use a short slug.
 - `DESCRIPTION` is free text, optional, everything to the end of the line.
 - Blank lines and lines starting with `#` are ignored.
@@ -76,9 +78,9 @@ Multiple log files can be passed at once and are merged before summarizing:
 $ python3 tsq.py 2026-08.txt 2026-09.txt --since 2026-08-15
 ```
 
-Malformed lines (bad date, bad time range, end before start) are reported to
-stderr with file and line number, and skipped -- they do not stop the rest of
-the file from being read.
+Malformed lines (bad date, bad time range, start and end identical) are
+reported to stderr with file and line number, and skipped -- they do not stop
+the rest of the file from being read.
 
 ## Requirements
 

@@ -50,12 +50,14 @@ class ParseLineTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "bad time range"):
             tsq.parse_line("2026-09-14 09:99-11:30 acme\n", "log.txt", 1)
 
-    def test_end_before_start(self):
-        with self.assertRaisesRegex(ValueError, "not after"):
-            tsq.parse_line("2026-09-14 11:30-09:00 acme\n", "log.txt", 1)
+    def test_end_before_start_crosses_midnight(self):
+        entry = tsq.parse_line("2026-09-14 22:00-02:00 acme\n", "log.txt", 1)
+        self.assertEqual(entry.start, datetime.time(22, 0))
+        self.assertEqual(entry.end, datetime.time(2, 0))
+        self.assertEqual(entry.hours, 4.0)
 
     def test_end_equal_start(self):
-        with self.assertRaisesRegex(ValueError, "not after"):
+        with self.assertRaisesRegex(ValueError, "identical"):
             tsq.parse_line("2026-09-14 09:00-09:00 acme\n", "log.txt", 1)
 
 
@@ -101,6 +103,14 @@ class SummarizeTests(unittest.TestCase):
         self.assertEqual(projects, [])
         self.assertEqual(total_hours, 0.0)
         self.assertEqual(total_entries, 0)
+
+    def test_entry_crossing_midnight_counts_toward_start_date(self):
+        entries = [
+            self._entry(datetime.date(2026, 9, 14), datetime.time(23, 0), datetime.time(1, 0), "acme"),
+        ]
+        projects, total_hours, _ = tsq.summarize(entries)
+        self.assertEqual(projects[0]["hours"], 2.0)
+        self.assertEqual(total_hours, 2.0)
 
 
 if __name__ == "__main__":

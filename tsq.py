@@ -27,9 +27,11 @@ class Entry:
 
     @property
     def hours(self):
-        today = datetime.date.today()
-        start_dt = datetime.datetime.combine(today, self.start)
-        end_dt = datetime.datetime.combine(today, self.end)
+        start_dt = datetime.datetime.combine(self.date, self.start)
+        # end <= start means the entry crossed midnight (checked at parse time),
+        # so the end time belongs to the following calendar day.
+        end_date = self.date if self.end > self.start else self.date + datetime.timedelta(days=1)
+        end_dt = datetime.datetime.combine(end_date, self.end)
         return (end_dt - start_dt).total_seconds() / 3600.0
 
 
@@ -59,8 +61,8 @@ def parse_line(raw, source, lineno):
     except ValueError:
         raise ValueError(f"bad time range {span_str!r}, expected HH:MM-HH:MM")
 
-    if end <= start:
-        raise ValueError(f"end time {end_str} is not after start time {start_str}")
+    if end == start:
+        raise ValueError(f"end time {end_str} is identical to start time {start_str}")
 
     return Entry(date, start, end, project, description, source, lineno)
 
